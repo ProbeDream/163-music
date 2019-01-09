@@ -5,16 +5,41 @@
     <title>管理页面</title>
   </head>
   <body>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+      #container {
+        padding: 50px 80px;
+        border: 1px dashed #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 200px;
+        border-radius: 30px;
+        flex-direction: column;
+      }
+    </style>
+
+    <div id="container">
+      <span id="upload">点击或拖曳上传!</span> 
+      <span>文件大小不能超过40mb</span>
+    </div>
+    
+    <div id="uploadStatus"></div>
+    
     <!-- 手动上传音乐 然后在七牛云内容存储里面上传音乐 拿到外链-->
     <audio controls src=""></audio>
-    <div id="container">
-        <button id="upload">upload</button>
-    </div>
+
     <!-- 引入外面介入的leanCloud的Av.min.js -->
     <script src="../node_modules/leancloud-storage/dist/av-min.js"></script>
+    <!-- 引入对应的moxie -->
+    <script src="../vendor/moxie.js"></script>
+    <!-- 引入对应的上传组件JS! -->
+    <script src="../node_modules/plupload/js/plupload.min.js"></script>
     <!-- 引入七牛云的SDK! -->
     <script src="../node_modules/qiniu-js/dist/qiniu.min.js"></script>
-    <script src="../node_modules/plupload/js/plupload.min.js"></script>
     <script>
       var APP_ID = "Qk7bOJsgiaGwGscbQcsXhAnp-gzGzoHsz";
       var APP_KEY = "o11HovVTt3cDtBlI92Os9Rgk";
@@ -30,12 +55,13 @@
         runtimes: "html5", // 上传模式,依次退化
         browse_button: "upload",
         //URL:pl22uq4tx.bkt.clouddn.com
-        
+
         // 上传选择的点选按钮，**必需**
         // 在初始化时，uptoken, uptoken_url, uptoken_func 三个参数中必须有一个被设置
         // 切如果提供了多个，其优先级为 uptoken > uptoken_url > uptoken_func
         // 其中 uptoken 是直接提供上传凭证，uptoken_url 是提供了获取上传凭证的地址，如果需要定制获取 uptoken 的过程则可以设置 uptoken_func
         // uptoken : '<Your upload token>', // uptoken 是上传凭证，由其他程序生成
+        uptoken_url: "http://localhost:8888/uptoken",
         // uptoken_url: '/uptoken',         // Ajax 请求 uptoken 的 Url，**强烈建议设置**（服务端提供）
         // uptoken_func: function(file){    // 在需要获取 uptoken 时，该方法会被调用
         //    // do something
@@ -47,7 +73,7 @@
         // unique_names: true,              // 默认 false，key 为文件名。若开启该选项，JS-SDK 会为每个文件自动生成key（文件名）
         // save_key: true,                  // 默认 false。若在服务端生成 uptoken 的上传策略中指定了 `save_key`，则开启，SDK在前端将不对key进行任何处理
         domain: "<Your bucket domain>", // bucket 域名，下载资源时用到，如：'http://xxx.bkt.clouddn.com/' **必需**
-        max_file_size: "40mb", // 最大文件体积限制
+        max_file_size: "8mb", // 最大文件体积限制
         dragdrop: true, // 开启可拖曳上传
         drop_element: "container", // 拖曳上传区域元素的 ID，拖曳文件或文件夹后可触发上传
         auto_start: true, // 选择文件后自动上传，若关闭需要自己绑定事件触发上传,
@@ -75,8 +101,10 @@
           },
           UploadProgress: function(up, file) {
             // 每个文件上传时,处理相关的事情
+            uploadStatus.textContent = "文件上传中!";
           },
           FileUploaded: function(up, file, info) {
+            uploadStatus.textContent = "上传完毕!";
             // 每个文件上传成功后,处理相关的事情
             // 其中 info.response 是文件上传成功后，服务端返回的json，形式如
             // {
@@ -93,14 +121,6 @@
           },
           UploadComplete: function() {
             //队列文件处理完毕后,处理相关的事情
-          },
-          Key: function(up, file) {
-            // 若想在前端对每个文件的key进行个性化处理，可以配置该函数
-            // 该配置必须要在 unique_names: false , save_key: false 时才生效
-
-            var key = "";
-            // do something with key here
-            return key;
           }
         }
       });
