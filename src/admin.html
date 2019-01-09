@@ -3,34 +3,55 @@
   <head>
     <meta charset="UTF-8" />
     <title>管理页面</title>
+    <link rel="stylesheet" href="../css/style.css" />
   </head>
   <body>
-    <style>
-      * {
-        padding: 0;
-        margin: 0;
-      }
-      #container {
-        padding: 50px 80px;
-        border: 1px dashed #ddd;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 200px;
-        border-radius: 30px;
-        flex-direction: column;
-      }
-    </style>
+    <div class="page">
+      <aside>
+        <div class="newSong">新建歌曲</div>
+        <ul class="songList">
+          <li class="active">歌曲1</li>
+          <li>歌曲2</li>
+          <li>歌曲3</li>
+          <li>歌曲4</li>
+          <li>歌曲5</li>
+          <li>歌曲6</li>
+          <li>歌曲7</li>
+          <li>歌曲8</li>
+          <li>歌曲9</li>
+          <li>歌曲10</li>
+        </ul>
 
-    <div id="container">
-      <span id="upload">点击或拖曳上传!</span> 
-      <span>文件大小不能超过40mb</span>
+        <div class="uploadArea">
+          <!-- draggable:可拖拽的 -->
+          <div id="uploadContainer" class="draggable" style="border:1px solid red;">
+            <!-- 可点击的区域! -->
+            <div id="uploadButton" class="clickable" >
+              <span id="upload">点击或拖曳上传!</span>
+              <span>文件大小不能超过40mb</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="uploadStatus"></div>
+      </aside>
+      <main>
+        <form action="form">
+          <div class="row">
+            <label> 歌曲 <input type="text" /> </label>
+          </div>
+          <div class="row">
+            <label> 歌手 <input type="text" /> </label>
+          </div>
+          <div class="row">
+            <label> 外链 <input type="text" /> </label>
+          </div>
+          <div class="row">
+            <label><button type="submit">保存</button></label>
+          </div>
+        </form>
+      </main>
     </div>
-    
-    <div id="uploadStatus"></div>
-    
-    <!-- 手动上传音乐 然后在七牛云内容存储里面上传音乐 拿到外链-->
-    <audio controls src=""></audio>
 
     <!-- 引入外面介入的leanCloud的Av.min.js -->
     <script src="../node_modules/leancloud-storage/dist/av-min.js"></script>
@@ -53,7 +74,7 @@
       var uploader = Qiniu.uploader({
         disable_statistics_report: false, // 禁止自动发送上传统计信息到七牛，默认允许发送
         runtimes: "html5", // 上传模式,依次退化
-        browse_button: "upload",
+        browse_button: "uploadButton",
         //URL:pl22uq4tx.bkt.clouddn.com
 
         // 上传选择的点选按钮，**必需**
@@ -72,10 +93,10 @@
         // Ajax请求downToken的Url，私有空间时使用,JS-SDK 将向该地址POST文件的key和domain,服务端返回的JSON必须包含`url`字段，`url`值为该文件的下载地址
         // unique_names: true,              // 默认 false，key 为文件名。若开启该选项，JS-SDK 会为每个文件自动生成key（文件名）
         // save_key: true,                  // 默认 false。若在服务端生成 uptoken 的上传策略中指定了 `save_key`，则开启，SDK在前端将不对key进行任何处理
-        domain: "<Your bucket domain>", // bucket 域名，下载资源时用到，如：'http://xxx.bkt.clouddn.com/' **必需**
+        domain: "pl22uq4tx.bkt.clouddn.com", // bucket 域名，下载资源时用到，如：'http://xxx.bkt.clouddn.com/' **必需**
         max_file_size: "8mb", // 最大文件体积限制
         dragdrop: true, // 开启可拖曳上传
-        drop_element: "container", // 拖曳上传区域元素的 ID，拖曳文件或文件夹后可触发上传
+        drop_element: "uploadContainer", // 拖曳上传区域元素的 ID，拖曳文件或文件夹后可触发上传
         auto_start: true, // 选择文件后自动上传，若关闭需要自己绑定事件触发上传,
         //x_vars : {
         //    自定义变量，参考http://developer.qiniu.com/docs/v6/api/overview/up/response/vars.html
@@ -104,17 +125,14 @@
             uploadStatus.textContent = "文件上传中!";
           },
           FileUploaded: function(up, file, info) {
-            uploadStatus.textContent = "上传完毕!";
             // 每个文件上传成功后,处理相关的事情
             // 其中 info.response 是文件上传成功后，服务端返回的json，形式如
-            // {
-            //    "hash": "Fh8xVqod2MQ1mocfI4S4KpRL6D98",
-            //    "key": "gogopher.jpg"
-            //  }
-            // 参考http://developer.qiniu.com/docs/v6/api/overview/up/response/simple-response.html
-            // var domain = up.getOption('domain');
-            // var res = parseJSON(info.response);
-            // var sourceLink = domain + res.key; 获取上传成功后的文件的Url
+            var domain = up.getOption("domain");
+            var response = JSON.parse(info.response);
+            var sourceLink =
+              "http://" + domain + "/" + encodeURIComponent(response.key); //获取上传成功后的文件的Url
+            uploadStatus.textContent =
+              "文件链接:" + sourceLink + " " + "文件名:" + response.key;
           },
           Error: function(up, err, errTip) {
             //上传出错时,处理相关的事情
