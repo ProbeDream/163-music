@@ -3,149 +3,33 @@
   <head>
     <meta charset="UTF-8" />
     <title>管理页面</title>
-    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="./css/style.css" />
   </head>
   <body>
     <div class="page">
       <aside>
-        <div class="newSong">新建歌曲</div>
-        <ul class="songList">
-          <li class="active">歌曲1</li>
-          <li>歌曲2</li>
-          <li>歌曲3</li>
-          <li>歌曲4</li>
-          <li>歌曲5</li>
-          <li>歌曲6</li>
-          <li>歌曲7</li>
-          <li>歌曲8</li>
-          <li>歌曲9</li>
-          <li>歌曲10</li>
-        </ul>
-
+        <div class="newSong"></div>
+        <div id="songList-container"></div>
         <div class="uploadArea">
-          <!-- draggable:可拖拽的 -->
-          <div id="uploadContainer" class="draggable" style="border:1px solid red;">
-            <!-- 可点击的区域! -->
-            <div id="uploadButton" class="clickable" >
-              <span id="upload">点击或拖曳上传!</span>
-              <span>文件大小不能超过40mb</span>
-            </div>
-          </div>
         </div>
-
-        <div id="uploadStatus"></div>
       </aside>
-      <main>
-        <form action="form">
-          <div class="row">
-            <label> 歌曲 <input type="text" /> </label>
-          </div>
-          <div class="row">
-            <label> 歌手 <input type="text" /> </label>
-          </div>
-          <div class="row">
-            <label> 外链 <input type="text" /> </label>
-          </div>
-          <div class="row">
-            <label><button type="submit">保存</button></label>
-          </div>
-        </form>
-      </main>
+      <main></main>
     </div>
-
+    <!-- 引入Jquery -->
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
     <!-- 引入外面介入的leanCloud的Av.min.js -->
     <script src="../node_modules/leancloud-storage/dist/av-min.js"></script>
+    <script src="./js/initializers/av.js"></script>
     <!-- 引入对应的moxie -->
     <script src="../vendor/moxie.js"></script>
     <!-- 引入对应的上传组件JS! -->
     <script src="../node_modules/plupload/js/plupload.min.js"></script>
     <!-- 引入七牛云的SDK! -->
     <script src="../node_modules/qiniu-js/dist/qiniu.min.js"></script>
-    <script>
-      var APP_ID = "Qk7bOJsgiaGwGscbQcsXhAnp-gzGzoHsz";
-      var APP_KEY = "o11HovVTt3cDtBlI92Os9Rgk";
-
-      AV.init({
-        appId: APP_ID,
-        appKey: APP_KEY
-      });
-    </script>
-    <script>
-      var uploader = Qiniu.uploader({
-        disable_statistics_report: false, // 禁止自动发送上传统计信息到七牛，默认允许发送
-        runtimes: "html5", // 上传模式,依次退化
-        browse_button: "uploadButton",
-        //URL:pl22uq4tx.bkt.clouddn.com
-
-        // 上传选择的点选按钮，**必需**
-        // 在初始化时，uptoken, uptoken_url, uptoken_func 三个参数中必须有一个被设置
-        // 切如果提供了多个，其优先级为 uptoken > uptoken_url > uptoken_func
-        // 其中 uptoken 是直接提供上传凭证，uptoken_url 是提供了获取上传凭证的地址，如果需要定制获取 uptoken 的过程则可以设置 uptoken_func
-        // uptoken : '<Your upload token>', // uptoken 是上传凭证，由其他程序生成
-        uptoken_url: "http://localhost:8888/uptoken",
-        // uptoken_url: '/uptoken',         // Ajax 请求 uptoken 的 Url，**强烈建议设置**（服务端提供）
-        // uptoken_func: function(file){    // 在需要获取 uptoken 时，该方法会被调用
-        //    // do something
-        //    return uptoken;
-        // },
-        get_new_uptoken: false, // 设置上传文件的时候是否每次都重新获取新的 uptoken
-        // downtoken_url: '/downtoken',
-        // Ajax请求downToken的Url，私有空间时使用,JS-SDK 将向该地址POST文件的key和domain,服务端返回的JSON必须包含`url`字段，`url`值为该文件的下载地址
-        // unique_names: true,              // 默认 false，key 为文件名。若开启该选项，JS-SDK 会为每个文件自动生成key（文件名）
-        // save_key: true,                  // 默认 false。若在服务端生成 uptoken 的上传策略中指定了 `save_key`，则开启，SDK在前端将不对key进行任何处理
-        domain: "pl22uq4tx.bkt.clouddn.com", // bucket 域名，下载资源时用到，如：'http://xxx.bkt.clouddn.com/' **必需**
-        max_file_size: "8mb", // 最大文件体积限制
-        dragdrop: true, // 开启可拖曳上传
-        drop_element: "uploadContainer", // 拖曳上传区域元素的 ID，拖曳文件或文件夹后可触发上传
-        auto_start: true, // 选择文件后自动上传，若关闭需要自己绑定事件触发上传,
-        //x_vars : {
-        //    自定义变量，参考http://developer.qiniu.com/docs/v6/api/overview/up/response/vars.html
-        //    'time' : function(up,file) {
-        //        var time = (new Date()).getTime();
-        //        do something with 'time'
-        //        return time;
-        //    },
-        //    'size' : function(up,file) {
-        //        var size = file.size;
-        // do something with 'size'
-        //        return size;
-        //    }
-        //},
-        init: {
-          FilesAdded: function(up, files) {
-            plupload.each(files, function(file) {
-              // 文件添加进队列后,处理相关的事情
-            });
-          },
-          BeforeUpload: function(up, file) {
-            // 每个文件上传前,处理相关的事情
-          },
-          UploadProgress: function(up, file) {
-            // 每个文件上传时,处理相关的事情
-            uploadStatus.textContent = "文件上传中!";
-          },
-          FileUploaded: function(up, file, info) {
-            // 每个文件上传成功后,处理相关的事情
-            // 其中 info.response 是文件上传成功后，服务端返回的json，形式如
-            var domain = up.getOption("domain");
-            var response = JSON.parse(info.response);
-            var sourceLink =
-              "http://" + domain + "/" + encodeURIComponent(response.key); //获取上传成功后的文件的Url
-            uploadStatus.textContent =
-              "文件链接:" + sourceLink + " " + "文件名:" + response.key;
-          },
-          Error: function(up, err, errTip) {
-            //上传出错时,处理相关的事情
-          },
-          UploadComplete: function() {
-            //队列文件处理完毕后,处理相关的事情
-          }
-        }
-      });
-
-      // domain 为七牛空间（bucket)对应的域名，选择某个空间后，可通过"空间设置->基本设置->域名设置"查看获取
-
-      // uploader 为一个 plupload 对象，继承了所有 plupload 的方法，参考http://plupload.com/docs
-    </script>
+    <script src="./js/eventHub.js"></script>
+    <script src="./js/song-form.js"></script>
+    <script src="./js/new-song.js"></script>
+    <script src="./js/song-list.js"></script>
+    <script src="./js/upload-song.js"></script>
   </body>
 </html>
