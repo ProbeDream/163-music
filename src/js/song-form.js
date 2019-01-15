@@ -5,7 +5,6 @@
       this.$el = $(this.el);
     },
     template: `
-        <h1>新建歌曲</h1>
         <form class="form">
           <div class="row">
             <label> 歌曲  </label>
@@ -32,6 +31,11 @@
         html = html.replace(`___${string}___`, data[string] || "");
       });
       $(this.el).html(html);
+      if (data.id) {
+        $(this.el).prepend('<h1>编辑歌曲</h1>');
+      }else{
+        $(this.el).prepend('<h1>新建歌曲</h1>'); 
+      }
     },reset() {
       //将当前的对象渲染 并且渲染的数据为空!
       this.render({});
@@ -76,6 +80,9 @@
         this.model.data=data;
         //使用view的render函数对其对应的数据进行渲染操作!
         this.view.render(this.model.data);
+      });
+      window.eventHub.on("new", ()=> {
+        this.view.reset();
       })
     },
     bindEvents() {

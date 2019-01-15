@@ -55,29 +55,28 @@
       });
     },bindEvents(){
       $(this.view.el).on('click','li',(e)=>{
-        /*
-        如果点击了其中的某一个li标签的话 就会调用一个方法
-        在当前的标签上面加上active 把对应的兄弟的active删除掉!
-        */
-        this.view.activeItem(e.currentTarget);
-        let songId=e.currentTarget.getAttribute('data-song-id');
-        let songs=this.model.data.songs;
-        let data;
-        for(let i=0;i<songs.length;i++){
-          //如果对应的songs的第i个的id等与当前的songId 那么就找到了当前的song对象!
-          if (songs[i].id === songId) {
-            data=songs[i];
-            break;
-          }
+      /*
+      如果点击了其中的某一个li标签的话 就会调用一个方法
+      在当前的标签上面加上active 把对应的兄弟的active删除掉!
+      */
+      this.view.activeItem(e.currentTarget);
+      let songId=e.currentTarget.getAttribute('data-song-id');
+      let songs=this.model.data.songs;
+      let data;
+      for(let i=0;i<songs.length;i++){
+      //如果对应的songs的第i个的id等与当前的songId 那么就找到了当前的song对象!
+        if (songs[i].id === songId) {
+          data=songs[i];
+          break;
         }
-        //将一个javaScript对象转换成为一个字符串! let copy=JSON.stringify(data);
-        
-        /*
-        用来解析JSON字符串,构造有字符串描述的JavaScript值或对象!
-        是从新的内存里面开辟出来的 因此不会改变原有的data!
-        JSON.parse(字符串/JSON.stringify({}))
-        */
-        window.eventHub.emit('select',JSON.parse(JSON.stringify(data)));
+      }
+      /*
+      将一个javaScript对象转换成为一个字符串! let copy=JSON.stringify(data);
+      用来解析JSON字符串,构造有字符串描述的JavaScript值或对象!
+      是从新的内存里面开辟出来的 因此不会改变原有的data!
+      JSON.parse(字符串/JSON.stringify({}))
+      */
+      window.eventHub.emit('select',JSON.parse(JSON.stringify(data)));
       })
     },bindEventsHub(){
       window.eventHub.on("upload", () => {
@@ -88,7 +87,10 @@
         this.model.data.songs.push(songData);
         this.view.render(this.model.data);
       });
-
+      //订阅
+      window.eventHub.on('new',()=>{
+        this.view.clearActive();
+      })
     }
   };
   controller.init(view, model);

@@ -23,8 +23,10 @@
         window.eventHub.on('select',(data)=>{
             this.deactive();
         })
+        $(this.view.el).on('click',this.active.bind(this));
       },active(){
           $(this.view.el).addClass('active');
+          window.eventHub.emit('new');
       },deactive(){
           //取消当前的新建歌曲栏的激活!
           $(this.view.el).removeClass('active');
