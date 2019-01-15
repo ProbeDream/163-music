@@ -20,8 +20,14 @@
           window.eventHub.on('upload',(data)=>{
             this.active();  
         });
+        window.eventHub.on('select',(data)=>{
+            this.deactive();
+        })
       },active(){
           $(this.view.el).addClass('active');
+      },deactive(){
+          //取消当前的新建歌曲栏的激活!
+          $(this.view.el).removeClass('active');
       }
   }
   controller.init(view,model);

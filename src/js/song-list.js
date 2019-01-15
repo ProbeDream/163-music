@@ -9,7 +9,7 @@
       $el.html(this.template);
       let { songs } = data;
       // let liList = songs.map((song) => $("<li></li>").text(song.name));
-      let liList = songs.map(song => $("<li></li>").text(song.name));
+      let liList = songs.map(song => $("<li></li>").text(song.name).attr('data-song-id',song.id));
       $el.find("ul").empty();
       liList.map(domLi => {
         $el.find("ul").append(domLi);
@@ -61,6 +61,8 @@
         在当前的标签上面加上active 把对应的兄弟的active删除掉!
         */
         this.view.activeItem(e.currentTarget);
+        let songId=e.currentTarget.getAttribute('data-song-id');
+        window.eventHub.emit('select',{id:songId});
       })
     },bindEventsHub(){
       window.eventHub.on("upload", () => {
