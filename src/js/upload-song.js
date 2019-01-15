@@ -30,7 +30,7 @@
         uptoken_url: "http://localhost:8888/uptoken",
         get_new_uptoken: false, // 设置上传文件的时候是否每次都重新获取新的 uptoken
         domain: "pl22uq4tx.bkt.clouddn.com", // bucket 域名，下载资源时用到，如：'http://xxx.bkt.clouddn.com/' **必需**
-        max_file_size: "8mb", // 最大文件体积限制
+        max_file_size: "20mb", // 最大文件体积限制
         dragdrop: true, // 开启可拖曳上传
         drop_element: this.view.find("#uploadContainer"), // 拖曳上传区域元素的 ID，拖曳文件或文件夹后可触发上传
         auto_start: true, // 选择文件后自动上传，若关闭需要自己绑定事件触发上传,
