@@ -7,9 +7,15 @@
     render(data) {
       let $el = $(this.el);
       $el.html(this.template);
-      let { songs } = data;
+      let { songs,selectSongId } = data;
       // let liList = songs.map((song) => $("<li></li>").text(song.name));
-      let liList = songs.map(song => $("<li></li>").text(song.name).attr('data-song-id',song.id));
+      let liList = songs.map(song =>{
+       let $li= $("<li></li>").text(song.name).attr('data-song-id',song.id)
+        if (song.id===selectSongId) {
+          $li.addClass('active');
+        }
+        return $li;
+      });
       $el.find("ul").empty();
       liList.map(domLi => {
         $el.find("ul").append(domLi);
@@ -20,7 +26,7 @@
         $li.addClass('active')
         .siblings('.active')
         .removeClass('active');
-    },clearActive() {
+    },clearActive(){
       $(this.el)
         .find(".active")
         .removeClass("active");
@@ -29,7 +35,8 @@
 
   let model = {
     data: {
-      songs: []
+      songs: [],
+      selectSongId:undefined
     },find() {
       var query = new AV.Query("Song");
       return query.find().then((songs) => {
@@ -59,8 +66,10 @@
       如果点击了其中的某一个li标签的话 就会调用一个方法
       在当前的标签上面加上active 把对应的兄弟的active删除掉!
       */
-      this.view.activeItem(e.currentTarget);
+      
       let songId=e.currentTarget.getAttribute('data-song-id');
+      this.model.data.selectSongId=songId;
+      this.view.render(this.model.data);
       let songs=this.model.data.songs;
       let data;
       for(let i=0;i<songs.length;i++){
