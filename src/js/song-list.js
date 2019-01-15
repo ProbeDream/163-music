@@ -79,9 +79,6 @@
       window.eventHub.emit('select',JSON.parse(JSON.stringify(data)));
       })
     },bindEventsHub(){
-      window.eventHub.on("upload", () => {
-        this.view.clearActive();
-      });  
       //订阅
       window.eventHub.on("create", songData => {
         this.model.data.songs.push(songData);

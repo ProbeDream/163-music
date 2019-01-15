@@ -71,18 +71,27 @@
       this.view.render(this.model.data);
       this.bindEvents();
       //订阅
+      /*
       window.eventHub.on("upload", (data) => {
         this.model.data=data;
         this.view.render(this.model.data);
       });
+       */
       window.eventHub.on('select',(data)=>{
         //如果用户点击一首歌曲 应该把对应歌曲的信息渲染到对应的歌曲表单当中!
         this.model.data=data;
         //使用view的render函数对其对应的数据进行渲染操作!
         this.view.render(this.model.data);
       });
-      window.eventHub.on("new", ()=> {
-        this.view.reset();
+      window.eventHub.on("new", (data)=> {
+        //this.model.data.id 如果为true的话 那么就是存在于数据库中的! 当刚刚上传的时候 是没有id生成的在leanCloud中的话!
+        if (this.model.data.id) {
+          this.model.data= {name:'',url:'',id:'',singer:''};
+        }else{
+          //否则就将传进来的data值 分配到当前的model.data中!
+          Object.assign(this.model.data,data);
+        }
+        this.view.render(this.model.data);
       })
     },
     bindEvents() {
@@ -90,7 +99,7 @@
       /*.on( events [, selector ] [, data ], handler(eventObject) )*/
       this.view.$el.on("submit", "form", (e) => {
         e.preventDefault();
-        let needs = 'name singer url'.split(' ')
+        let needs = 'name singer url'.split(' ');
         let data = {};
         needs.map((string) => {
           data[string] = this.view.$el.find(`[name="${string}"]`).val();

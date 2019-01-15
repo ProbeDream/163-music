@@ -54,7 +54,7 @@
             var sourceLink =
               "http://" + domain + "/" + encodeURIComponent(response.key); //获取上传成功后的文件的Url
             //uploadStatus.textContent ="文件链接:" + sourceLink + " " + "文件名:" + response.key;
-            window.eventHub.emit("upload", {
+            window.eventHub.emit("new", {
               url: sourceLink,
               name: response.key
             });

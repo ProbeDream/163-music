@@ -17,16 +17,17 @@
           this.view.render(this.model.data);
           //在默认的时候就激活 当前的item!
           this.active();
-          window.eventHub.on('upload',(data)=>{
-            this.active();  
+          window.eventHub.on('new',(data)=>{
+           this.active();
         });
         window.eventHub.on('select',(data)=>{
             this.deactive();
         })
-        $(this.view.el).on('click',this.active.bind(this));
+        $(this.view.el).on('click',()=>{
+            window.eventHub.emit('new');
+        });
       },active(){
           $(this.view.el).addClass('active');
-          window.eventHub.emit('new');
       },deactive(){
           //取消当前的新建歌曲栏的激活!
           $(this.view.el).removeClass('active');
