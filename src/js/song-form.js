@@ -5,23 +5,23 @@
       this.$el = $(this.el);
     },
     template: `
-        <form class="form">
-          <div class="row">
-            <label> 歌曲  </label>
-            <input name="name" type="text" value="___name___"/>
-          </div>
-          <div class="row">
-            <label> 歌手  </label>
-            <input name="singer" type="text" value="___singer___" />
-          </div>
-          <div class="row">
-            <label> 外链  </label>
-            <input name="url" type="text" value="___url___"/>
-          </div>
-          <div class="row actions">
-            <button type="submit">保存</button>
-          </div>
-        </form>   
+    <form class="form">
+      <div class="row">
+        <label> 歌曲  </label>
+        <input name="name" type="text" value="___name___"/>
+      </div>
+      <div class="row">
+        <label> 歌手  </label>
+        <input name="singer" type="text" value="___singer___" />
+      </div>
+      <div class="row">
+        <label> 外链  </label>
+        <input name="url" type="text" value="___url___"/>
+      </div>
+      <div class="row actions">
+        <button type="submit">保存</button>
+      </div>
+    </form>   
         `,
     //如果用户没有传输data的话 那么对应的data的值为空!
     render(data = {}) {
@@ -60,7 +60,18 @@
         },(error) => {
           console.error(error);
         });
+    },update(data){
+      // 数据修改更新操作!
+      var song = AV.Object.createWithoutData('Song',this.data.id);
+      song.set('name',data.name);
+      song.set('singer',data.singer);
+      song.set('url',data.url);
+      return song.save().then((Response)=>{
+        Object.assign(this.data,data);
+        return Response;
+      });
     }
+
   };
 
   let controller = {
@@ -93,26 +104,40 @@
         }
         this.view.render(this.model.data);
       })
-    },
-    bindEvents() {
+    },create(){
+      let needs = 'name singer url'.split(' ');
+      let data = {};
+      needs.map((string) => {
+        data[string] = this.view.$el.find(`[name="${string}"]`).val();
+      });
+      //调用mode模块的create方法 传入对象的数据data
+      this.model.create(data).then(() => {
+        //如果创建成功 则会对当前的form表 进行数据清空 并且将对应的data数据 进行JSON转换!并且解析成新的对象!
+        this.view.reset();
+        let string=JSON.stringify(this.model.data);
+        let object=JSON.parse(string);
+        //发布 将调用create方法 传入的数据为当前的object!
+        window.eventHub.emit("create", object);
+      });
+    },update(){
+      let needs = 'name singer url'.split(' ');
+      let data = {};
+      needs.map((string) => {
+        data[string] = this.view.$el.find(`[name="${string}"]`).val();
+      });
+      this.model.update(data).then(()=>{
+        window.eventHub.emit('update',JSON.parse(JSON.stringify(this.model.data)));
+      });
+    },bindEvents() {
       //如果说当submit提交的时候 就会阻止默认事件
       /*.on( events [, selector ] [, data ], handler(eventObject) )*/
       this.view.$el.on("submit", "form", (e) => {
         e.preventDefault();
-        let needs = 'name singer url'.split(' ');
-        let data = {};
-        needs.map((string) => {
-          data[string] = this.view.$el.find(`[name="${string}"]`).val();
-        });
-        //调用mode模块的create方法 传入对象的数据data
-        this.model.create(data).then(() => {
-          //如果创建成功 则会对当前的form表 进行数据清空 并且将对应的data数据 进行JSON转换!并且解析成新的对象!
-          this.view.reset();
-          let string=JSON.stringify(this.model.data);
-          let object=JSON.parse(string);
-          //发布 将调用create方法 传入的数据为当前的object!
-          window.eventHub.emit("create", object);
-        });
+        if (this.model.data.id) {
+          this.update();
+        }else{
+          this.create();
+        }
       });
     }
   };
