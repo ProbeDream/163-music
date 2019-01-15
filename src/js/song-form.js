@@ -71,6 +71,12 @@
         this.model.data=data;
         this.view.render(this.model.data);
       });
+      window.eventHub.on('select',(data)=>{
+        //如果用户点击一首歌曲 应该把对应歌曲的信息渲染到对应的歌曲表单当中!
+        this.model.data=data;
+        //使用view的render函数对其对应的数据进行渲染操作!
+        this.view.render(this.model.data);
+      })
     },
     bindEvents() {
       //如果说当submit提交的时候 就会阻止默认事件
