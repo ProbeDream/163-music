@@ -17,7 +17,7 @@
             this.view=view;
             this.view.init();
             this.model=model;
-            this.bindEvents();
+            this.bindEvents();  
         },bindEvents(){
             window.eventHub.on('selectTab',(tabName)=>{
                 if (tabName === 'page-3') {
@@ -27,7 +27,6 @@
                 }
             });
         }
-
     }
     controller.init(view,model);
 }
