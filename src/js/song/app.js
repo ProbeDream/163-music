@@ -1,29 +1,33 @@
 {
   let view = {
     el:'#app',
-    template:`
-    <audio src={{url}}></audio>
-    <div>
-      <button class="play">播放</button>
-      <button class="pause">暂停</button>
-    </div> 
-    `,render(data){
-      $(this.el).html(this.template.replace('{{url}}',data.url));
+    render(data){
+      let {song}=data;
+      console.log(song);
+      $(this.el).css('background-image',`url(${song.cover})`);
+      $(this.el).find('img.cover').attr('src',song.cover);
+      $(this.el).find('audio').attr('src',song.url);
+      // 每次都是重新渲染 audio标签 如果说对应的src里面的内容不是 song.url的话那么就渲染 否则不渲染!
+      if ($(this.el).find('audio').attr('src') !== song.url) {
+        $(this.el).find('audio').attr('src',song.url);
+      }
     },play(){
-      let audio=$(this.el).find('audio')[0];
-      audio.play();
+      $(this.el).find('audio')[0].play();
+      $(this.el).find('.disc-container').addClass('playing');
     },pause(){
-      let audio=$(this.el).find('audio')[0];
-      audio.pause();
-    }
+      $(this.el).find('audio')[0].pause();
+      $(this.el).find('.disc-container').removeClass('playing');
+    } 
   };
 
   let model = {
     data:{
-      id:'',
-      name:'',
-      singer:'',
-      url:''
+      song:{
+        id:'',
+        name:'',
+        singer:'',
+        url:''
+      },status:'pause'
     },
     getSongId() {
       //查询参数的获取!
@@ -55,7 +59,7 @@
       //通过对应的id 拿到的是一个对象 并不是多个对象!
       return song.get(id).then((todo)=>{
        //将对应的对象拷贝到当前的data对象上面就行了! ...表示 attributes有什么属性 该对象就会有什么属性!
-        Object.assign(this.data,{id:todo.id,...todo.attributes});
+        Object.assign(this.data.song,{id:todo.id,...todo.attributes});
         return todo;
       }, function (error) {
         // 异常处理
@@ -73,14 +77,14 @@
         this.view.render(this.model.data);
       });
       this.bindEvents();
-    },bindEvents(){
-      $(this.view.el).on('click','.play',()=>{
-        this.view.play();
-      })
-      $(this.view.el).on('click','.pause',()=>{
-        this.view.pause();
-      })
-    }
+     },bindEvents(){
+        $(this.view.el).on('click',".icon-play",()=>{
+            this.view.play();
+        })
+        $(this.view.el).on('click','.icon-pause',()=>{
+            this.view.pause();
+        })
+     }
   };
   controller.init(view, model);
 }
