@@ -18,10 +18,14 @@
         <label> 外链  </label>
         <input name="url" type="text" value="___url___"/>
       </div>
+        <div class="row">
+        <label> 封面  </label>
+        <input name="cover" type="text" value="___cover___"/>
+      </div>
       <div class="row">
-      <label> 封面  </label>
-      <input name="cover" type="text" value="___cover___"/>
-    </div>
+        <label> 歌词  </label>
+        <textarea cols=100 rows=10 name="lyric">___lyric___</textarea>
+      </div>
       <div class="row actions">
         <button type="submit">保存</button>
       </div>
@@ -29,7 +33,7 @@
         `,
     //如果用户没有传输data的话 那么对应的data的值为空!
     render(data = {}) {
-      let placeholders = ["name", "url", "singer", "id","cover"];
+      let placeholders = ["name", "url", "singer", "id","cover","lyric"];
       let html = this.template;
       placeholders.map((string) => {
         html = html.replace(`___${string}___`, data[string] || "");
@@ -47,7 +51,7 @@
   };
 
   let model = {
-    data: { name: "", singer: "", url: "", id: "" ,cover:''},
+    data: { name: "", singer: "", url: "", id: "" ,cover:'',lyric:''},
     create(data) {
       // 声明类型
       var Song = AV.Object.extend("Song");
@@ -58,6 +62,7 @@
       song.set("singer", data.singer);
       song.set("url", data.url);
       song.set('cover',data.cover);
+      song.set('lyric',data.lyric);
       // 设置优先级
       return song.save().then((newSong) => {
           let { id, attributes } = newSong;
@@ -72,6 +77,7 @@
       song.set('singer',data.singer);
       song.set('url',data.url);
       song.set('cover',data.cover);
+      song.set('lyric',data.lyric);
       return song.save().then((Response)=>{
         Object.assign(this.data,data);
         return Response;
@@ -103,7 +109,7 @@
       window.eventHub.on("new", (data)=> {
         //this.model.data.id 如果为true的话 那么就是存在于数据库中的! 当刚刚上传的时候 是没有id生成的在leanCloud中的话!
         if (this.model.data.id) {
-          this.model.data= {name:'',url:'',id:'',singer:'',cover:''};
+          this.model.data= {name:'',url:'',id:'',singer:'',cover:'',lyric:''};
         }else{
           //否则就将传进来的data值 分配到当前的model.data中!
           Object.assign(this.model.data,data);
@@ -111,7 +117,7 @@
         this.view.render(this.model.data);
       })
     },create(){
-      let needs = 'name singer url cover'.split(' ');
+      let needs = 'name singer url cover lyric'.split(' ');
       let data = {};
       needs.map((string) => {
         data[string] = this.view.$el.find(`[name="${string}"]`).val();
@@ -126,7 +132,7 @@
         window.eventHub.emit("create", object);
       });
     },update(){
-      let needs = 'name singer url cover'.split(' ');
+      let needs = 'name singer url cover lyric'.split(' ');
       let data = {};
       needs.map((string) => {
         data[string] = this.view.$el.find(`[name="${string}"]`).val();
