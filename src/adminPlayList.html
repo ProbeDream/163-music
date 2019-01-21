@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="UTF-8" />
+    <title>歌单管理页面</title>
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <div class="playListFormWrapper">
+      <h1>创建歌单</h1>
+      <form action="" class="playList">
+        <div class="row">
+          <label>歌单名<input type="text" name="name"/></label>
+        </div>
+        <div class="row">
+          <label
+            >描述 <textarea name="summary" id="" cols="30" rows="10"></textarea>
+          </label>
+        </div>
+        <div class="row"><button type="submit">创建</button></div>
+      </form>
+    </div>
+
+    <!-- 引入Jquery -->
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <!-- 引入外面介入的leanCloud的Av.min.js -->
+    <script src="../node_modules/leancloud-storage/dist/av-min.js"></script>
+    <script src="./js/initializers/av.js"></script>
+    <script src="./js/admin/eventHub.js"></script>
+    <script>
+      {
+        let view = {
+          el: ".playListFormWrapper",
+          init() {
+            this.$el = $(this.el);
+            this.$form = $(this.el).find("form");
+          }
+        };
+        let model = {
+          create(data) {
+            // 声明类型
+            var PlayList = AV.Object.extend("PlayList");
+            // 新建对象
+            var playList = new PlayList();
+            // 设置名称
+            playList.set("name", data.name);
+            playList.set("summary", data.summary);
+            playList.save().then(
+              newPlayList => {
+                console.log(newPlayList);
+              },
+              error => {
+                console.error(error);
+              }
+            );
+          }
+        };
+        let controller = {
+          init(view, model) {
+            this.view = view;
+            this.view.init();
+            this.model = model;
+            this.bindEvents();
+          },
+          bindEvents() {
+            this.view.$el.on("submit", "form", e => {
+              e.preventDefault();
+              let form = this.view.$form.get(0);
+              let keys = ["name", "summary"];
+              let data = {};
+              keys.reduce((prev, item) => {
+                prev[item] = form[item].value;
+                return prev;
+              }, data);
+              this.model.create(data);
+            });
+          }
+        };
+        controller.init(view, model);
+      }
+    </script>
+  </body>
+</html>

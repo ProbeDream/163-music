@@ -10,7 +10,10 @@
       this.$el.find("img.cover").attr("src", song.cover);
       // 每次都是重新渲染 audio标签 如果说对应的src里面的内容不是 song.url的话那么就渲染 否则不渲染!
       if (this.$el.find("audio").attr("src") !== song.url) {
-        let audio = this.$el.find("audio").attr("src", song.url).get(0);
+        let audio = this.$el
+          .find("audio")
+          .attr("src", song.url)
+          .get(0);
         audio.onended = () => {
           window.eventHub.emit("songEnd");
         };
@@ -23,23 +26,34 @@
       } else {
         this.$el.find(".disc-container").removeClass("playing");
       }
-      this.$el.find("div.song-description > h1").text(song.name);
+      this.$el.find(".song-description > h1").text(song.name);
       let { lyric } = song;
       lyric.split("\n").map(string => {
         let p = document.createElement("p");
         let regex = /\[([\d:.]+)\](.+)/;
         let matches = string.match(regex);
+        /*
+        0: "[00:00.10]可乐 - 赵紫骅"
+        1: "00:00.10"
+        2: "可乐 - 赵紫骅"
+         */
+        console.log(matches);
         if (matches) {
           p.textContent = matches[2];
           /*
-      time为匹配后的第二部分! 通过split进行分割之后
-      按照十进制的方式解析当前的时间为数字 然后将分钟转化成为秒钟!
-      */
+          time为匹配后的第二部分! 通过split进行分割之后
+          按照十进制的方式解析当前的时间为数字 然后将分钟转化成为秒钟!
+          */
           let time = matches[1];
           let parts = time.split(":");
+          /*
+          ["01", "23.10"]
+          */
+
+          console.log(parts);
           let minutes = parts[0];
           let seconds = parts[1];
-          let newTime = parseFloat(minutes, 10) * 60 + parseFloat(seconds, 10);
+          let newTime = parseInt(minutes, 10) * 60 + parseFloat(seconds, 10);
           p.setAttribute("data-time", newTime);
         } else {
           p.textContent = string;
@@ -57,24 +71,30 @@
       let allP = this.$el.find(".lyric>.lines>p");
       let p;
       for (let i = 0; i < allP.length; i++) {
-        if (i === (allP.length - 1)) {
-          p=allP[i];
+        if (i === allP.length - 1) {
+          p = allP[i];
           break;
         } else {
           let currentTime = allP.eq(i).attr("data-time");
           let nextTime = allP.eq(i + 1).attr("data-time");
-          if (currentTime <= Time && Time <= nextTime) {
-              p=allP[i]; break; 
+          if (currentTime <= Time && Time < nextTime) {
+            p = allP[i];
+            break;
           }
         }
       }
-      let pHeight=p.getBoundingClientRect().top; 
-             let lineHeight=this.$el.find('.lyric>.lines')[0].getBoundingClientRect().top;
-             let height=pHeight-lineHeight;
-             this.$el.find('.lyric>.lines').css({
-               transform:'translateY(${-(height-25)}px)'
-      }) 
-      $(p).addClass('active').siblings('.active').removeClass('active');
+      let pHeight = p.getBoundingClientRect().top;
+      let lineHeight = this.$el.find(".lyric>.lines")[0].getBoundingClientRect()
+        .top;
+      let height = pHeight - lineHeight;
+      console.log(height);
+      this.$el.find(".lyric>.lines").css({
+        transform: `translateY(${-(height - 25)}px)`
+      });
+      $(p)
+        .addClass("active")
+        .siblings(".active")
+        .removeClass("active");
     }
   };
 
@@ -86,7 +106,7 @@
         singer: "",
         url: ""
       },
-      status: "pause"
+      status: "paused"
     },
     getSongId() {
       //查询参数的获取!
