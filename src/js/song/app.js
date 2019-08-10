@@ -37,7 +37,6 @@
         1: "00:00.10"
         2: "可乐 - 赵紫骅"
          */
-        console.log(matches);
         if (matches) {
           p.textContent = matches[2];
           /*
@@ -49,8 +48,6 @@
           /*
           ["01", "23.10"]
           */
-
-          console.log(parts);
           let minutes = parts[0];
           let seconds = parts[1];
           let newTime = parseInt(minutes, 10) * 60 + parseFloat(seconds, 10);
@@ -61,12 +58,8 @@
         this.$el.find(".lyric > .lines").append(p);
       });
     },
-    play() {
-      this.$el.find("audio")[0].play();
-    },
-    pause() {
-      this.$el.find("audio")[0].pause();
-    },showLyric(Time) {
+    play() {this.$el.find("audio")[0].play();},
+    pause() {this.$el.find("audio")[0].pause();},showLyric(Time) {
       //拿到所有的p标签 然后便利整个p标签 伪数组!
       let allP = this.$el.find(".lyric>.lines>p");
       let p;
@@ -84,10 +77,8 @@
         }
       }
       let pHeight = p.getBoundingClientRect().top;
-      let lineHeight = this.$el.find(".lyric>.lines")[0].getBoundingClientRect()
-        .top;
+      let lineHeight = this.$el.find(".lyric>.lines")[0].getBoundingClientRect().top;
       let height = pHeight - lineHeight;
-      console.log(height);
       this.$el.find(".lyric>.lines").css({
         transform: `translateY(${-(height - 25)}px)`
       });
